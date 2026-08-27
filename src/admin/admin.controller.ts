@@ -67,8 +67,8 @@ export class AdminController {
       this.prisma.lead.findMany({
         where,
         orderBy: [
-          { validated: 'asc' },   // Não validados primeiro
-          { createdAt: 'desc' },  // Mais recentes primeiro
+          { validated: 'asc' },  
+          { createdAt: 'desc' },
         ],
         skip,
         take: pageSize,
