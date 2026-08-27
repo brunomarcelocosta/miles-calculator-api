@@ -1,0 +1,68 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Lead {
+  id               String   @id @default(uuid()) @db.VarChar(36)
+  fullName         String   @db.VarChar(160)
+  email            String   @db.VarChar(180)
+  phone            String   @db.VarChar(20)
+  instagram        String?  @db.VarChar(60)
+  consentAt        DateTime
+
+  // Step tracking — qual a última tela em que o lead está
+  step             String   @default("lead") @db.VarChar(30)
+
+  // Respostas individuais (uma coluna por pergunta do quiz)
+  cardPf           String?  @db.VarChar(40)
+  cardPj           String?  @db.VarChar(40)
+  uber             String?  @db.VarChar(40)
+  ifood            String?  @db.VarChar(40)
+  retailAnnual     String?  @db.VarChar(40)
+  travelAnnual     String?  @db.VarChar(40)
+  travelStyle      String?  @db.VarChar(20)
+  knowledgeLevel   String?  @db.VarChar(40)
+  freeTripsPerYear String?  @db.VarChar(20)
+  managerInterest  String?  @db.VarChar(40)
+
+  // Resultado calculado no front (preenchido ao chegar no step 'result')
+  estimateMin      Int?
+  estimateMax      Int?
+  destinations     Json?
+
+  // Status de validação pelo admin
+  validated        Boolean  @default(false)
+  validatedAt      DateTime?
+
+  // UTM / tracking
+  utmSource        String?  @db.VarChar(120)
+  utmMedium        String?  @db.VarChar(120)
+  utmCampaign      String?  @db.VarChar(180)
+  utmContent       String?  @db.VarChar(180)
+  utmTerm          String?  @db.VarChar(180)
+  fbclid           String?  @db.VarChar(255)
+  referrer         String?  @db.Text
+  userAgent        String?  @db.Text
+  ipHash           String?  @db.VarChar(64)
+
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@index([createdAt])
+  @@index([email])
+  @@index([step])
+}
+
+model AdminUser {
+  id           String    @id @default(uuid()) @db.VarChar(36)
+  email        String    @unique @db.VarChar(180)
+  name         String    @db.VarChar(120)
+  passwordHash String    @db.VarChar(255)
+  lastLoginAt  DateTime?
+  createdAt    DateTime  @default(now())
+}
