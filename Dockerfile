@@ -20,11 +20,12 @@ WORKDIR /app
 
 ENV NODE_ENV=production
 
-# Apenas dependências de produção
+# Dependências de produção + prisma CLI para migrations no start
 COPY package.json package-lock.json ./
 COPY prisma ./prisma/
 
 RUN npm ci --omit=dev --ignore-scripts && \
+    npm install prisma@6.19.3 --save-dev --ignore-scripts && \
     npx prisma generate && \
     npm cache clean --force
 
