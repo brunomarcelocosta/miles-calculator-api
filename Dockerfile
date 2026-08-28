@@ -31,9 +31,11 @@ RUN npm ci --omit=dev --ignore-scripts && \
 
 COPY --from=builder /app/dist ./dist
 
-# Non-root user
+# Non-root user — recebe ownership de /app para o prisma db push
+# poder escrever no client em runtime sem erro de permissao
 RUN addgroup -g 1001 -S appgroup && \
-    adduser -S appuser -u 1001 -G appgroup
+    adduser -S appuser -u 1001 -G appgroup && \
+    chown -R appuser:appgroup /app
 USER appuser
 
 EXPOSE 3000
