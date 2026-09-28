@@ -1,15 +1,16 @@
+import 'dotenv/config';
+import { migrateDiagnosticSchema } from './prisma/migrate-diagnostic';
 import { NestFactory } from '@nestjs/core';
 import type { NestExpressApplication } from '@nestjs/platform-express';
-import cookieParser from 'cookie-parser';
 import { AppModule } from '@/app.module';
 
 async function bootstrap() {
+  await migrateDiagnosticSchema();
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
   // Atrás de proxy (Railway / load balancer): confia no X-Forwarded-For
   app.set('trust proxy', 1);
 
-  app.use(cookieParser());
 
   app.setGlobalPrefix('api');
 

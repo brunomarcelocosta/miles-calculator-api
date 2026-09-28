@@ -2,7 +2,7 @@
 
 Configure `TRAVION_SERVICE_KEY` com 32–256 caracteres aleatórios. Compartilhe o mesmo valor exclusivamente com o backend Travion (`Calculator__ServiceKey`). Chave ausente desabilita o acesso da integração.
 
-Os novos endpoints não alteram captura pública, sessão do administrador antigo ou banco de dados:
+O portal consulta a API por chave de serviço. O painel administrativo antigo e sua autenticação foram removidos; os leads permanecem preservados:
 
 - `GET /api/integration/leads?page=1&pageSize=20&search=&from=&to=`
 - `PATCH /api/integration/leads/:id` — dados de contato e respostas permitidas, sem mass assignment de status, consentimento ou tracking.

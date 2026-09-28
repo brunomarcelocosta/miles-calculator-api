@@ -11,15 +11,15 @@ import {
   ConflictException,
   NotFoundException,
   Logger,
-} from '@nestjs/common';
-import { Throttle } from '@nestjs/throttler';
-import type { Request } from 'express';
-import { createLeadSchema } from './dto/create-lead.dto';
-import { updateLeadStepSchema } from './dto/update-lead-step.dto';
-import { LeadsService } from './leads.service';
-import { QUESTIONS, findOption } from '@/domain/config/questionCatalog';
+} from "@nestjs/common";
+import { Throttle } from "@nestjs/throttler";
+import type { Request } from "express";
+import { createLeadSchema } from "./dto/create-lead.dto";
+import { updateLeadStepSchema } from "./dto/update-lead-step.dto";
+import { LeadsService } from "./leads.service";
+import { QUESTIONS, findOption } from "@/domain/config/questionCatalog";
 
-@Controller('leads')
+@Controller("leads")
 export class LeadsController {
   private readonly logger = new Logger(LeadsController.name);
 
@@ -37,7 +37,7 @@ export class LeadsController {
 
     if (!parsed.success) {
       throw new BadRequestException({
-        message: 'Dados inválidos.',
+        message: "Dados inválidos.",
         errors: parsed.error.flatten().fieldErrors,
       });
     }
@@ -47,29 +47,35 @@ export class LeadsController {
     // Honeypot — retorna 201 fake para não dar dica ao bot
     if (dto.honeypot && dto.honeypot.length > 0) {
       this.logger.warn(`Honeypot triggered from IP ${this.extractIp(req)}`);
-      return { id: '00000000-0000-0000-0000-000000000000' };
+      return { id: "00000000-0000-0000-0000-000000000000" };
     }
 
     // Reenvios usam o mesmo ID; uma nova submissão pode ser iniciada pelo mesmo contato.
     if (dto.submissionId) {
       const previous = await this.leadsService.findById(dto.submissionId);
       if (previous) {
-        if (previous.email !== dto.email || previous.phone !== dto.phone) {
-          throw new ConflictException('Identificador de envio já utilizado.');
+        if (
+          previous.email !== (dto.email ?? null) ||
+          previous.phone !== (dto.phone ?? null) ||
+          (previous.quizVersion ?? 1) !== (dto.quizVersion ?? 1)
+        ) {
+          throw new ConflictException("Identificador de envio já utilizado.");
         }
         return { id: previous.id };
       }
     }
 
-    const isDup = !dto.submissionId && await this.leadsService.isDuplicate(dto.email);
+    const isDup =
+      !dto.submissionId &&
+      (await this.leadsService.isDuplicate(dto.email, dto.phone));
     if (isDup) {
       throw new ConflictException(
-        'Você já enviou seus dados há pouco. Aguarde alguns minutos.',
+        "Você já enviou seus dados há pouco. Aguarde alguns minutos.",
       );
     }
 
     const ip = this.extractIp(req);
-    const userAgent = req.headers['user-agent'];
+    const userAgent = req.headers["user-agent"];
 
     let lead;
     try {
@@ -78,7 +84,12 @@ export class LeadsController {
       const previous = dto.submissionId
         ? await this.leadsService.findById(dto.submissionId)
         : null;
-      if (previous && previous.email === dto.email && previous.phone === dto.phone) {
+      if (
+        previous &&
+        previous.email === (dto.email ?? null) &&
+        previous.phone === (dto.phone ?? null) &&
+        (previous.quizVersion ?? 1) === (dto.quizVersion ?? 1)
+      ) {
         return { id: previous.id };
       }
       throw error;
@@ -89,11 +100,11 @@ export class LeadsController {
     return { id: lead.id };
   }
 
-  @Post(':id/complete')
+  @Post(":id/complete")
   @Throttle({ default: { ttl: 60_000, limit: 10 } })
-  async complete(@Param('id') id: string) {
+  async complete(@Param("id") id: string) {
     const result = await this.leadsService.complete(id);
-    if (!result) throw new NotFoundException('Lead não encontrado.');
+    if (!result) throw new NotFoundException("Lead não encontrado.");
     return result;
   }
 
@@ -101,31 +112,34 @@ export class LeadsController {
    * PATCH /api/leads/:id/step — atualiza step e resposta a cada tela do quiz.
    * Rate limit mais permissivo (10 perguntas rápidas).
    */
-  @Patch(':id/step')
+  @Patch(":id/step")
   @Throttle({ default: { ttl: 60_000, limit: 30 } })
   @HttpCode(HttpStatus.OK)
-  async updateStep(
-    @Param('id') id: string,
-    @Body() body: unknown,
-  ) {
+  async updateStep(@Param("id") id: string, @Body() body: unknown) {
     // Validar que o lead existe
     const existing = await this.leadsService.findById(id);
     if (!existing) {
-      throw new NotFoundException('Lead não encontrado.');
+      throw new NotFoundException("Lead não encontrado.");
     }
 
     const parsed = updateLeadStepSchema.safeParse(body);
     if (!parsed.success) {
       throw new BadRequestException({
-        message: 'Dados inválidos.',
+        message: "Dados inválidos.",
         errors: parsed.error.flatten().fieldErrors,
       });
     }
 
+    if ((existing.quizVersion ?? 1) !== (parsed.data.quizVersion ?? 1))
+      throw new BadRequestException("Versão do questionário inválida.");
+    if (parsed.data.quizVersion === 2) {
+      await this.leadsService.updateStep(id, parsed.data);
+      return { ok: true };
+    }
     const { step, answer } = parsed.data;
     const question = QUESTIONS.find((item) => item.id === step);
-    if (!question || !findOption(question, answer)) {
-      throw new BadRequestException('Resposta inválida para a pergunta.');
+    if (!question || !findOption(question, answer as string)) {
+      throw new BadRequestException("Resposta inválida para a pergunta.");
     }
 
     await this.leadsService.updateStep(id, parsed.data);
@@ -134,10 +148,10 @@ export class LeadsController {
   }
 
   private extractIp(req: Request): string {
-    const forwarded = req.headers['x-forwarded-for'];
-    if (typeof forwarded === 'string') {
-      return forwarded.split(',')[0]!.trim();
+    const forwarded = req.headers["x-forwarded-for"];
+    if (typeof forwarded === "string") {
+      return forwarded.split(",")[0]!.trim();
     }
-    return req.ip ?? '0.0.0.0';
+    return req.ip ?? "0.0.0.0";
   }
 }

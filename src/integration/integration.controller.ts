@@ -38,7 +38,11 @@ export class IntegrationController {
     const pageSize = Math.min(100, Math.max(1, Number.parseInt(query.pageSize || '20', 10) || 20));
     const search = query.search?.trim().slice(0, 180);
     const date = (value: string, end = false) => { const d = new Date(value); if (Number.isNaN(d.getTime())) throw new BadRequestException('Data inválida.'); if (end && /^\d{4}-\d{2}-\d{2}$/.test(value)) d.setUTCHours(23, 59, 59, 999); return d; };
+    if (query.segment && !['educate','activate','optimize'].includes(query.segment)) throw new BadRequestException('Segmento inválido.');
+    if (query.completion && !['complete','incomplete'].includes(query.completion)) throw new BadRequestException('Conclusão inválida.');
     const where = {
+      ...(query.segment ? { segment: query.segment } : {}),
+      ...(query.completion === 'complete' ? { step: 'result' } : query.completion === 'incomplete' ? { NOT: { step: 'result' } } : {}),
       ...(search ? { OR: [{ fullName: { contains: search } }, { email: { contains: search } }, { phone: { contains: search } }] } : {}),
       ...(query.from || query.to ? { createdAt: { ...(query.from ? { gte: date(query.from) } : {}), ...(query.to ? { lte: date(query.to, true) } : {}) } } : {}),
     };

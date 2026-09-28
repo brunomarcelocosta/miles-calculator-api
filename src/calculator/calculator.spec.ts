@@ -35,6 +35,7 @@ describe('calculadora compartilhada', () => {
       { get: () => 'test-salt' } as unknown as ConfigService,
     );
     const result = await service.complete('lead');
+    if (!result || !("estimate" in result)) throw new Error("Expected v1 result");
     expect(result?.estimate.min.annualPoints).toBe(338333);
     expect(result?.estimate.max.annualPoints).toBe(766945);
     expect(result?.estimate.min.transferBonusPoints).toBe(0);

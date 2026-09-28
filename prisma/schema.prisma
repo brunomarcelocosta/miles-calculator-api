@@ -10,10 +10,34 @@ datasource db {
 model Lead {
   id               String   @id @default(uuid()) @db.VarChar(36)
   fullName         String   @db.VarChar(160)
-  email            String   @db.VarChar(180)
-  phone            String   @db.VarChar(20)
+  email            String?  @db.VarChar(180)
+  phone            String?  @db.VarChar(20)
   instagram        String?  @db.VarChar(60)
   consentAt        DateTime
+
+
+  quizVersion      Int      @default(1)
+  preferredChannel String?  @db.VarChar(20)
+  travelFrequency  String?  @db.VarChar(40)
+  purchaseChannel  String?  @db.VarChar(40)
+  monthlySpend     String?  @db.VarChar(40)
+  mainCard         String?  @db.VarChar(40)
+  cardIssuer       String?  @db.VarChar(60)
+  pointsRelationship String? @db.VarChar(40)
+  hasPoints        String?  @db.VarChar(40)
+  pointsPrograms   Json?
+  pointsAmount     String?  @db.VarChar(40)
+  tripInMind       String?  @db.VarChar(40)
+  tripDestination  String?  @db.VarChar(60)
+  tripDestinationOther String? @db.VarChar(120)
+  tripWhen         String?  @db.VarChar(40)
+  tripTravelers    String?  @db.VarChar(40)
+  tripDetailsSaved Boolean @default(false)
+  tripCabin        String?  @db.VarChar(40)
+  profileSummary   String?  @db.Text
+  segment          String?  @db.VarChar(20)
+  priority         String?  @db.VarChar(20)
+  completedAt      DateTime?
 
   // Step tracking — qual a última tela em que o lead está
   step             String   @default("lead") @db.VarChar(30)
@@ -55,6 +79,9 @@ model Lead {
 
   @@index([createdAt])
   @@index([email])
+  @@index([phone])
+  @@index([quizVersion, segment])
+  @@index([completedAt])
   @@index([step])
 }
 

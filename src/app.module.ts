@@ -5,8 +5,7 @@ import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { PrismaModule } from '@/prisma/prisma.module';
 import { HealthModule } from '@/health/health.module';
 import { LeadsModule } from '@/leads/leads.module';
-import { AuthModule } from '@/auth/auth.module';
-import { AdminModule } from '@/admin/admin.module';
+import { IntegrationModule } from '@/integration/integration.module';
 import { CalculatorModule } from '@/calculator/calculator.module';
 
 @Module({
@@ -24,8 +23,7 @@ import { CalculatorModule } from '@/calculator/calculator.module';
     PrismaModule,
     HealthModule,
     LeadsModule,
-    AuthModule,
-    AdminModule,
+    IntegrationModule,
     CalculatorModule,
   ],
   providers: [

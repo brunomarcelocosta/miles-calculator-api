@@ -1,10 +1,12 @@
-import { Controller, Get } from '@nestjs/common';
-import { QUESTIONS } from '@/domain/config/questionCatalog';
+import { Controller, Get, Query } from "@nestjs/common";
+import { catalog } from "@/domain/diagnostic/diagnostic";
+import { QUESTIONS } from "@/domain/config/questionCatalog";
 
-@Controller('calculator')
+@Controller("calculator")
 export class CalculatorController {
-  @Get('quiz')
-  quiz() {
+  @Get("quiz")
+  quiz(@Query("version") version?: string) {
+    if (version === "2") return catalog;
     return {
       version: 1,
       questions: QUESTIONS,

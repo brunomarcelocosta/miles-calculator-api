@@ -1,0 +1,377 @@
+{
+  "version": 2,
+  "questions": [
+    {
+      "id": "travelFrequency",
+      "title": "Com que frequência você costuma viajar?",
+      "kind": "single",
+      "options": [
+        {
+          "id": "rare",
+          "label": "Menos de uma vez por ano / ainda não viajo"
+        },
+        {
+          "id": "one",
+          "label": "1 vez por ano"
+        },
+        {
+          "id": "two_three",
+          "label": "2–3 vezes por ano"
+        },
+        {
+          "id": "four_six",
+          "label": "4–6 vezes por ano"
+        },
+        {
+          "id": "many",
+          "label": "Mais de 6 vezes por ano"
+        }
+      ]
+    },
+    {
+      "id": "purchaseChannel",
+      "title": "Como você costuma comprar suas passagens?",
+      "kind": "single",
+      "options": [
+        {
+          "id": "search",
+          "label": "Google / Skyscanner"
+        },
+        {
+          "id": "airline",
+          "label": "Direto com a companhia aérea"
+        },
+        {
+          "id": "agency",
+          "label": "Agência de viagens"
+        },
+        {
+          "id": "points",
+          "label": "Já utilizo pontos ou milhas"
+        },
+        {
+          "id": "not_yet",
+          "label": "Ainda não compro passagens"
+        }
+      ]
+    },
+    {
+      "id": "monthlySpend",
+      "title": "Em média, quanto você gasta por mês no cartão?",
+      "kind": "single",
+      "options": [
+        {
+          "id": "none",
+          "label": "Não uso cartão"
+        },
+        {
+          "id": "upto_5k",
+          "label": "Até R$ 5 mil"
+        },
+        {
+          "id": "5_10k",
+          "label": "Mais de R$ 5 mil até R$ 10 mil"
+        },
+        {
+          "id": "10_20k",
+          "label": "Mais de R$ 10 mil até R$ 20 mil"
+        },
+        {
+          "id": "20_30k",
+          "label": "Mais de R$ 20 mil até R$ 30 mil"
+        },
+        {
+          "id": "above_30k",
+          "label": "Mais de R$ 30 mil"
+        }
+      ],
+      "helper": "Some seus cartões pessoais. Informe o equivalente em reais (R$), sem incluir gastos da empresa."
+    },
+    {
+      "id": "mainCard",
+      "kind": "card",
+      "title": "Você concentra seus gastos em um cartão principal?",
+      "options": [
+        {
+          "id": "one",
+          "label": "Sim, quase tudo em um cartão"
+        },
+        {
+          "id": "many",
+          "label": "Divido entre dois ou mais"
+        },
+        {
+          "id": "none",
+          "label": "Não uso cartão"
+        }
+      ],
+      "banks": [
+        {
+          "id": "Itaú",
+          "label": "Itaú"
+        },
+        {
+          "id": "Bradesco",
+          "label": "Bradesco"
+        },
+        {
+          "id": "Santander",
+          "label": "Santander"
+        },
+        {
+          "id": "Banco do Brasil",
+          "label": "Banco do Brasil"
+        },
+        {
+          "id": "Caixa",
+          "label": "Caixa"
+        },
+        {
+          "id": "Nubank",
+          "label": "Nubank"
+        },
+        {
+          "id": "Inter",
+          "label": "Inter"
+        },
+        {
+          "id": "XP",
+          "label": "XP"
+        },
+        {
+          "id": "C6",
+          "label": "C6"
+        },
+        {
+          "id": "BTG",
+          "label": "BTG"
+        },
+        {
+          "id": "Outro",
+          "label": "Outro"
+        }
+      ]
+    },
+    {
+      "id": "pointsRelationship",
+      "title": "Hoje, como você se relaciona com pontos e milhas?",
+      "kind": "single",
+      "options": [
+        {
+          "id": "none",
+          "label": "Não sei como funciona"
+        },
+        {
+          "id": "unused",
+          "label": "Tenho pontos, mas quase não uso"
+        },
+        {
+          "id": "sometimes",
+          "label": "Às vezes uso para viajar"
+        },
+        {
+          "id": "frequent",
+          "label": "Já utilizo com frequência"
+        }
+      ]
+    },
+    {
+      "id": "hasPoints",
+      "title": "Você possui pontos ou milhas acumulados hoje?",
+      "kind": "single",
+      "options": [
+        {
+          "id": "yes",
+          "label": "Sim"
+        },
+        {
+          "id": "maybe",
+          "label": "Acho que sim, mas não sei quanto"
+        },
+        {
+          "id": "no",
+          "label": "Não tenho"
+        },
+        {
+          "id": "unknown",
+          "label": "Não sei"
+        }
+      ]
+    },
+    {
+      "id": "pointsProfile",
+      "kind": "points",
+      "title": "Onde você possui pontos?",
+      "helper": "Escolha os programas que conhece. O saldo é opcional; pontos de programas diferentes têm valores diferentes.",
+      "options": [
+        {
+          "id": "Livelo",
+          "label": "Livelo"
+        },
+        {
+          "id": "Esfera",
+          "label": "Esfera"
+        },
+        {
+          "id": "Smiles",
+          "label": "Smiles"
+        },
+        {
+          "id": "LATAM Pass",
+          "label": "LATAM Pass"
+        },
+        {
+          "id": "Azul",
+          "label": "Azul"
+        },
+        {
+          "id": "Bancos",
+          "label": "Bancos"
+        },
+        {
+          "id": "Outros",
+          "label": "Outros"
+        },
+        {
+          "id": "Não sei o programa",
+          "label": "Não sei o programa"
+        }
+      ],
+      "amounts": [
+        {
+          "id": "unknown",
+          "label": "Não sei quanto"
+        },
+        {
+          "id": "upto_10k",
+          "label": "Até 10 mil"
+        },
+        {
+          "id": "10_50k",
+          "label": "Mais de 10 mil até 50 mil"
+        },
+        {
+          "id": "50_100k",
+          "label": "Mais de 50 mil até 100 mil"
+        },
+        {
+          "id": "100_300k",
+          "label": "Mais de 100 mil até 300 mil"
+        },
+        {
+          "id": "above_300k",
+          "label": "Mais de 300 mil"
+        }
+      ]
+    },
+    {
+      "id": "tripInMind",
+      "title": "Tem alguma viagem em mente?",
+      "kind": "single",
+      "options": [
+        {
+          "id": "yes",
+          "label": "Sim"
+        },
+        {
+          "id": "no",
+          "label": "Ainda não"
+        }
+      ]
+    },
+    {
+      "id": "tripDetails",
+      "kind": "trip",
+      "title": "Conte um pouco sobre essa viagem",
+      "helper": "Preencha o que já sabe. Você também pode pular esta etapa.",
+      "destinations": [
+        {
+          "id": "Europa",
+          "label": "Europa"
+        },
+        {
+          "id": "Estados Unidos",
+          "label": "Estados Unidos"
+        },
+        {
+          "id": "América do Sul",
+          "label": "América do Sul"
+        },
+        {
+          "id": "Caribe e México",
+          "label": "Caribe e México"
+        },
+        {
+          "id": "Ásia",
+          "label": "Ásia"
+        },
+        {
+          "id": "Nordeste",
+          "label": "Nordeste"
+        },
+        {
+          "id": "Outro",
+          "label": "Outro"
+        }
+      ],
+      "timings": [
+        {
+          "id": "soon",
+          "label": "Nos próximos 3 meses"
+        },
+        {
+          "id": "3_6",
+          "label": "Mais de 3 até 6 meses"
+        },
+        {
+          "id": "6_12",
+          "label": "Mais de 6 até 12 meses"
+        },
+        {
+          "id": "later",
+          "label": "Mais de 1 ano"
+        },
+        {
+          "id": "unknown",
+          "label": "Ainda não sei"
+        }
+      ],
+      "travelers": [
+        {
+          "id": "one",
+          "label": "1 pessoa"
+        },
+        {
+          "id": "two",
+          "label": "2 pessoas"
+        },
+        {
+          "id": "three_four",
+          "label": "3–4 pessoas"
+        },
+        {
+          "id": "many",
+          "label": "5 ou mais pessoas"
+        }
+      ],
+      "cabins": [
+        {
+          "id": "economy",
+          "label": "Econômica"
+        },
+        {
+          "id": "premium",
+          "label": "Premium Economy"
+        },
+        {
+          "id": "business",
+          "label": "Executiva"
+        },
+        {
+          "id": "unknown",
+          "label": "Ainda não sei"
+        }
+      ]
+    }
+  ]
+}
