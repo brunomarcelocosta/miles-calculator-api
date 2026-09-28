@@ -4,20 +4,14 @@ import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '@/prisma/prisma.service';
 import type { CreateLeadDto } from './dto/create-lead.dto';
 import type { UpdateLeadStepDto } from './dto/update-lead-step.dto';
-
-/** Colunas válidas para resposta de quiz */
-const ANSWER_COLUMNS = [
-  'cardPf',
-  'cardPj',
-  'uber',
-  'ifood',
-  'retailAnnual',
-  'travelAnnual',
-  'travelStyle',
-  'knowledgeLevel',
-  'freeTripsPerYear',
-  'managerInterest',
-] as const;
+import { QUESTIONS, findOption } from '@/domain/config/questionCatalog';
+import { defaultConfigProvider } from '@/domain/config/CalculatorConfigProvider';
+import { resolveSpendProfile } from '@/domain/services/SpendProfileResolver';
+import { MilesEstimator } from '@/domain/services/MilesEstimator';
+import { DestinationRecommender } from '@/domain/services/DestinationRecommender';
+import { BadRequestException } from '@nestjs/common';
+import type { QuizAnswers } from '@/domain/model/QuizAnswers';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class LeadsService {
@@ -53,6 +47,7 @@ export class LeadsService {
   async create(dto: CreateLeadDto, ip: string, userAgent: string | undefined) {
     return this.prisma.lead.create({
       data: {
+        ...(dto.submissionId ? { id: dto.submissionId } : {}),
         fullName: dto.fullName,
         email: dto.email,
         phone: dto.phone,
@@ -76,27 +71,47 @@ export class LeadsService {
    * Atualiza o step e grava a resposta na coluna correspondente.
    */
   async updateStep(leadId: string, dto: UpdateLeadStepDto) {
-    const data: Record<string, unknown> = { step: dto.step };
-
-    // Se é um step de pergunta, grava a resposta na coluna
-    if (dto.answer && ANSWER_COLUMNS.includes(dto.step as any)) {
-      data[dto.step] = dto.answer;
-    }
-
-    // Se é o step 'result', grava estimativas e destinos
-    if (dto.step === 'result') {
-      if (dto.estimateMin != null) data.estimateMin = dto.estimateMin;
-      if (dto.estimateMax != null) data.estimateMax = dto.estimateMax;
-      if (dto.destinations != null) data.destinations = dto.destinations;
-    }
-
     return this.prisma.lead.update({
       where: { id: leadId },
-      data,
+      data: {
+        step: dto.step,
+        [dto.step]: dto.answer,
+        estimateMin: null,
+        estimateMax: null,
+        destinations: Prisma.DbNull,
+      },
     });
   }
 
   async findById(id: string) {
     return this.prisma.lead.findUnique({ where: { id } });
+  }
+
+  async complete(id: string) {
+    const lead = await this.findById(id);
+    if (!lead) return null;
+
+    const answers: QuizAnswers = {};
+    for (const question of QUESTIONS) {
+      const answer = lead[question.id];
+      if (!answer || !findOption(question, answer)) {
+        throw new BadRequestException(`Resposta ausente ou inválida: ${question.id}.`);
+      }
+      answers[question.id] = answer;
+    }
+
+    const profile = resolveSpendProfile(answers, defaultConfigProvider);
+    const estimate = new MilesEstimator({ configProvider: defaultConfigProvider }).estimate(profile);
+    const recommendations = new DestinationRecommender().recommend(estimate, profile.travelStyle);
+    await this.prisma.lead.update({
+      where: { id },
+      data: {
+        step: 'result',
+        estimateMin: estimate.min.annualPoints,
+        estimateMax: estimate.max.annualPoints,
+        destinations: recommendations.map((item) => item.destination.id),
+      },
+    });
+    return { estimate, recommendations, travelStyle: profile.travelStyle };
   }
 }

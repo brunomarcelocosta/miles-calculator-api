@@ -26,6 +26,7 @@ function hasGivenAndFamilyName(value: string): boolean {
 }
 
 export const createLeadSchema = z.object({
+  submissionId: z.uuid().optional(),
   fullName: z
     .string()
     .trim()

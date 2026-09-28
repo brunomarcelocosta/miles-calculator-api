@@ -30,7 +30,7 @@ model Lead {
   freeTripsPerYear String?  @db.VarChar(20)
   managerInterest  String?  @db.VarChar(40)
 
-  // Resultado calculado no front (preenchido ao chegar no step 'result')
+  // Resultado calculado no backend após validar as nove respostas
   estimateMin      Int?
   estimateMax      Int?
   destinations     Json?

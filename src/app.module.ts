@@ -7,6 +7,7 @@ import { HealthModule } from '@/health/health.module';
 import { LeadsModule } from '@/leads/leads.module';
 import { AuthModule } from '@/auth/auth.module';
 import { AdminModule } from '@/admin/admin.module';
+import { CalculatorModule } from '@/calculator/calculator.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { AdminModule } from '@/admin/admin.module';
     LeadsModule,
     AuthModule,
     AdminModule,
+    CalculatorModule,
   ],
   providers: [
     {

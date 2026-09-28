@@ -17,6 +17,7 @@ import type { Request } from 'express';
 import { createLeadSchema } from './dto/create-lead.dto';
 import { updateLeadStepSchema } from './dto/update-lead-step.dto';
 import { LeadsService } from './leads.service';
+import { QUESTIONS, findOption } from '@/domain/config/questionCatalog';
 
 @Controller('leads')
 export class LeadsController {
@@ -49,8 +50,18 @@ export class LeadsController {
       return { id: '00000000-0000-0000-0000-000000000000' };
     }
 
-    // Plausibilidade: duplicata recente
-    const isDup = await this.leadsService.isDuplicate(dto.email);
+    // Reenvios usam o mesmo ID; uma nova submissão pode ser iniciada pelo mesmo contato.
+    if (dto.submissionId) {
+      const previous = await this.leadsService.findById(dto.submissionId);
+      if (previous) {
+        if (previous.email !== dto.email || previous.phone !== dto.phone) {
+          throw new ConflictException('Identificador de envio já utilizado.');
+        }
+        return { id: previous.id };
+      }
+    }
+
+    const isDup = !dto.submissionId && await this.leadsService.isDuplicate(dto.email);
     if (isDup) {
       throw new ConflictException(
         'Você já enviou seus dados há pouco. Aguarde alguns minutos.',
@@ -60,11 +71,30 @@ export class LeadsController {
     const ip = this.extractIp(req);
     const userAgent = req.headers['user-agent'];
 
-    const lead = await this.leadsService.create(dto, ip, userAgent);
+    let lead;
+    try {
+      lead = await this.leadsService.create(dto, ip, userAgent);
+    } catch (error) {
+      const previous = dto.submissionId
+        ? await this.leadsService.findById(dto.submissionId)
+        : null;
+      if (previous && previous.email === dto.email && previous.phone === dto.phone) {
+        return { id: previous.id };
+      }
+      throw error;
+    }
 
     this.logger.log(`Lead created: ${lead.id} (${dto.email})`);
 
     return { id: lead.id };
+  }
+
+  @Post(':id/complete')
+  @Throttle({ default: { ttl: 60_000, limit: 10 } })
+  async complete(@Param('id') id: string) {
+    const result = await this.leadsService.complete(id);
+    if (!result) throw new NotFoundException('Lead não encontrado.');
+    return result;
   }
 
   /**
@@ -90,6 +120,12 @@ export class LeadsController {
         message: 'Dados inválidos.',
         errors: parsed.error.flatten().fieldErrors,
       });
+    }
+
+    const { step, answer } = parsed.data;
+    const question = QUESTIONS.find((item) => item.id === step);
+    if (!question || !findOption(question, answer)) {
+      throw new BadRequestException('Resposta inválida para a pergunta.');
     }
 
     await this.leadsService.updateStep(id, parsed.data);
