@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { isValidPhoneNumber } from 'libphonenumber-js/max';
 
 /**
  * POST /api/leads — cria o lead no momento do preenchimento do formulário.
@@ -40,7 +41,11 @@ export const createLeadSchema = z.object({
     .max(LIMITS.email)
     .transform((v) => v.toLowerCase())
     .pipe(z.string().refine(looksLikeEmail)),
-  phone: z.string().regex(/^\d{10,11}$/),
+  // Keep national numbers for existing app clients; the site now sends E.164.
+  phone: z.union([
+    z.string().regex(/^\d{10,11}$/),
+    z.string().regex(/^\+[1-9]\d{1,14}$/).refine((value) => isValidPhoneNumber(value)),
+  ]),
   instagram: z.string().trim().max(LIMITS.instagram).nullable().optional(),
   consentAt: z.iso.datetime(),
 

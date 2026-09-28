@@ -13,6 +13,8 @@ Reenvie o mesmo `submissionId` após falha de conexão. A API devolve o lead exi
 
 O app envia `utmSource=travion_app` e `utmMedium=app`. Esses leads usam a mesma tabela e o mesmo painel administrativo do site, sem criar contas de cliente. Não há chave de serviço nas chamadas públicas.
 
+O site envia telefones de qualquer país em formato E.164 (por exemplo, `+14165550123` ou `+5512997643952`). A API valida o código do país e o número completo. Números brasileiros nacionais de 10 ou 11 dígitos continuam aceitos para compatibilidade com versões existentes do app. A coluna atual comporta o formato internacional, sem migração. Publique a API antes do frontend que envia o novo formato.
+
 ## Verificação
 
 ```sh
